@@ -1,0 +1,2 @@
+# true_ranking_plugin
+通过获取b站番剧长短评计算实际的评分数据，适用于Yunzai-Bot，核心代码来自Bilibili@看你看过的霓虹
