@@ -1,6 +1,7 @@
 import plugin from '../../lib/plugins/plugin.js'
 import { segment } from "oicq";
 import { createRequire } from "module";
+import fetch from "node-fetch"
 //const require_ = createRequire(import.meta.url);
 
 //const axios = require_('axios');
@@ -44,12 +45,32 @@ export class example extends plugin {
         
         const reg = /^[0-9]+.?[0-9]*$/
         
-        if (md_id==""||!reg.test(md_id)){
-            this.reply("id应该为纯数字！")
+        if (md_id==""){
+            this.reply("不可为空ID！")
             this.reply(md_id)
             return
         }
-        
+        if(md_id.search(/(https:\/\/|http:\/\/)(b23\.tv\/|(www\.)?bilibili\.com\/)/g)!=-1){
+            this.reply("您使用了一个地址，正在尝试转换为md_id……")
+            if(md_id.search(/md/g)!=-1){
+                var md_id_arr = md_id.match(/\/md(\d+)/g)
+                this.reply(md_id_arr[0])
+                var md_id_result = md_id_arr[0].replace('/md','')
+                md_id_result = md_id_result.replace('/','')
+                md_id = md_id_result
+            }
+            if(md_id.search(/ep/g)!=-1)
+                await this.turn2md(md_id)
+            this.reply(`已获取到md_id:${md_id}`)
+        }
+        else{
+            if (!reg.test(md_id)){
+                this.reply("您应该在番剧详情页地址栏获取md后的ID\n或者发送番剧分享链接")
+                this.reply(md_id)
+                return
+            }
+        }
+        ```
         await this.baseInfo(md_id)
         console.log("--统计短评");
         e.reply("统计短评中")
@@ -59,6 +80,17 @@ export class example extends plugin {
         await this.scoreMain('long', e, md_id)
         this.average(e)
         //rmDialog()
+        ```
+    }
+    
+    async turn2md(url){
+        const ep_res = await fetch(url, { "method": "GET" });
+        var ep_src = await ep_res.text();
+        var md_id_arr = ep_src.match(/www\.bilibili\.com\/bangumi\/media\/md(.*?)\//g)
+        var md_id_result = md_id_arr[0].replace('www.bilibili.com/bangumi/media/md','')
+        md_id_result = md_id_result.replace('/','')
+        md_id = md_id_result
+        //return md_id_result
     }
     
     async baseInfo(md_id){
@@ -122,6 +154,6 @@ export class example extends plugin {
     //main()
     
   async b_socre_help(e){
-      await e.reply("回复“#番剧评分”+番剧mdID即可查看番剧真实评分")
+      await e.reply("回复“#番剧评分”+番剧mdID/分享链接即可查看番剧真实评分")
   }
 }
