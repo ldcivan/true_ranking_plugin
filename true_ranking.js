@@ -70,7 +70,7 @@ export class example extends plugin {
                 return
             }
         }
-        ```
+        
         await this.baseInfo(md_id)
         console.log("--统计短评");
         e.reply("统计短评中")
@@ -80,7 +80,7 @@ export class example extends plugin {
         await this.scoreMain('long', e, md_id)
         this.average(e)
         //rmDialog()
-        ```
+        
     }
     
     async turn2md(url){
