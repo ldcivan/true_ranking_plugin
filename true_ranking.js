@@ -8,12 +8,12 @@ import fetch from "node-fetch"
 
 var md_id = "" //
 
-const allScore = []
+var allScore = []
 let totalCount = {
     short: 0,
     long: 0,
 }
-let render = null
+//let render = null
 
 var offical_title = ""
 var offical_score = 0
@@ -41,6 +41,11 @@ export class example extends plugin {
     
     async b_socre(e) {
         //beforeRender()
+        allScore = [] //重置
+        totalCount = { //重置
+            short: 0,
+            long: 0,
+        }
         md_id = e.msg.replace(/#| |番剧评分| /g, "")
         
         const reg = /^[0-9]+.?[0-9]*$/
@@ -87,6 +92,10 @@ export class example extends plugin {
         const ep_res = await fetch(url, { "method": "GET" });
         var ep_src = await ep_res.text();
         var md_id_arr = ep_src.match(/www\.bilibili\.com\/bangumi\/media\/md(.*?)\//g)
+        if(md_id_arr==[]){
+            this.reply("ep转md错误，请直接发送md号")
+            return
+        }
         var md_id_result = md_id_arr[0].replace('www.bilibili.com/bangumi/media/md','')
         md_id_result = md_id_result.replace('/','')
         md_id = md_id_result
@@ -145,7 +154,7 @@ export class example extends plugin {
         const s = total / allScore.length
         const sf = s.toFixed(1)
         console.log('平均分:', sf)
-        this.reply(`番剧名：${offical_title}\n真实平均分：${sf}\n基于${allScore.length}个评价（含长短评）\n----------\n官方平均分：${offical_score}\n基于${offical_count}个评价（含长短评）`)
+        this.reply(`番剧名：${offical_title}\n真实平均分：${sf}\n基于${allScore.length+1}个评价（含${totalCount.short}个短评与${totalCount.long}个长评）\n----------\n官方平均分：${offical_score}\n基于${offical_count}个评价（含长短评）`)
     }
     async handlerList(list) {
         allScore.push(...list.map(item => item.score))
