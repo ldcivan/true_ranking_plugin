@@ -24,7 +24,7 @@ export class example extends plugin {
         super({
             name: 'true_score',
             event: 'message',
-            priority: 5000,
+            priority: 1000,
             rule: [
                 {
                   reg: "^#?番剧评分帮助$",
@@ -51,8 +51,8 @@ export class example extends plugin {
         const reg = /^[0-9]+.?[0-9]*$/
         
         if (md_id==""){
-            this.reply("不可为空ID！")
-            this.reply(md_id)
+            this.reply("不可为空ID！\n若不明白如何使用该插件，请向bot发送“#番剧评分帮助”获取使用方式。")
+            //this.reply(md_id)
             return
         }
         if(md_id.search(/(https:\/\/|http:\/\/)(b23\.tv\/|(www\.)?bilibili\.com\/)/g)!=-1){
@@ -70,7 +70,7 @@ export class example extends plugin {
         }
         else{
             if (!reg.test(md_id)){
-                this.reply("您应该在番剧详情页地址栏获取md后的ID\n或者发送番剧分享链接")
+                this.reply("你输入的不是合法的Bilibili番剧链接/ID。\n您应该在番剧详情页地址栏获取md后的ID，或者直接发送番剧分享链接。")
                 this.reply(md_id)
                 return
             }
@@ -91,13 +91,12 @@ export class example extends plugin {
     async turn2md(url){
         const ep_res = await fetch(url, { "method": "GET" });
         var ep_src = await ep_res.text();
-        var md_id_arr = ep_src.match(/www\.bilibili\.com\/bangumi\/media\/md(.*?)\//g)
+        var md_id_arr = ep_src.match(/www\.bilibili\.com\/bangumi\/media\/md(\d+)/g)
         if(md_id_arr==[]){
             this.reply("ep转md错误，请直接发送md号")
             return
         }
         var md_id_result = md_id_arr[0].replace('www.bilibili.com/bangumi/media/md','')
-        md_id_result = md_id_result.replace('/','')
         md_id = md_id_result
         //return md_id_result
     }
