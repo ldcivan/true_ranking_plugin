@@ -69,6 +69,18 @@ export class example extends plugin {
             this.reply(`已获取到md_id:${md_id}`)
         }
         else{
+            if(md_id.search(/md/g)!=-1){
+                var md_id_arr = md_id.match(/md(\d+)/g)
+                this.reply(md_id_arr[0])
+                var md_id_result = md_id_arr[0].replace('md','')
+                md_id = md_id_result
+            }
+            if(md_id.search(/ep/g)!=-1){
+                this.reply(`将由ep_id转为md_id`)
+                var ep_id_arr = md_id.match(/ep(\d+)/g)
+                await this.turn2md("https://b23.tv/"+ep_id_arr)
+            }
+            this.reply(`已获取到md_id:${md_id}`)
             if (!reg.test(md_id)){
                 this.reply("你输入的不是合法的Bilibili番剧链接/ID。\n您应该在番剧详情页地址栏获取md后的ID，或者直接发送番剧分享链接。")
                 this.reply(md_id)
