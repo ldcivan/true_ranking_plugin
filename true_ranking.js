@@ -89,6 +89,7 @@ export class example extends plugin {
     }
     
     async turn2md(url){
+        url = url.match(/(https?:\/\/[^\s]+)/g);
         const ep_res = await fetch(url, { "method": "GET" });
         var ep_src = await ep_res.text();
         var md_id_arr = ep_src.match(/www\.bilibili\.com\/bangumi\/media\/md(\d+)/g)
