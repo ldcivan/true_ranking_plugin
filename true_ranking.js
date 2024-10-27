@@ -132,7 +132,8 @@ export class example extends plugin {
         }
     }
     
-    async getScore(next, type, e, md_id) {
+    async getScore(next, type, e) {
+        await this.delay(200);
     
         //var local_url = window.location.href;
         
@@ -145,12 +146,23 @@ export class example extends plugin {
         if (next) {
             url += `&cursor=${next}`
         }
-        const res = await fetch(url, { "method": "GET" });
-        const { data } = await res.json()
-        if (totalCount[type] == 0) {
-            totalCount[type] = data.total
+        const res = await fetch(url, { "headers": { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0", "Reference": "https://www.bilibili.com"}, "method": "GET" });
+        let { data, code } = await res.json();
+        if (code === 0) {
+            console.log("GET")
+            if (totalCount[type] == 0) {
+                totalCount[type] = data.total
+            }
+        } else {
+            this.reply('可能出现风控 ERR:' + JSON.stringify(code));
+            data = JSON.parse(`{"list":[], "next":0}`)
+            //data = await this.getScore(next, type, e);
         }
         return data
+    }
+    
+    async delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
     
     async scoreMain(type, e) {
@@ -174,7 +186,7 @@ export class example extends plugin {
         const s = total / allScore.length
         const sf = s.toFixed(1)
         console.log('平均分:', sf)
-        this.reply(`番剧名：${offical_title}\n真实平均分：${sf}\n基于${allScore.length}个评价（含${totalCount.short}个短评与${totalCount.long}个长评）\n----------\n官方平均分：${offical_score}\n基于${offical_count}个评价（含长短评）`)
+        this.reply(`番剧名：${offical_title}\n真实平均分：${sf}\n基于实际收集到的${allScore.length}个评价（官方标注含${totalCount.short}个短评与${totalCount.long}个长评，实际收集数据可能因风控等原因不与标称值相同）\n----------\n官方平均分：${offical_score}\n基于${offical_count}个评价（含长短评）`)
     }
     async handlerList(list) {
         allScore.push(...list.map(item => item.score))
