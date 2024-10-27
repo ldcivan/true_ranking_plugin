@@ -6,7 +6,7 @@ import fetch from "node-fetch"
 
 //const axios = require_('axios');
 
-var md_id = "" //
+var md_id = ""; //
 
 var allScore = []
 let totalCount = {
@@ -15,9 +15,9 @@ let totalCount = {
 }
 //let render = null
 
-var offical_title = ""
-var offical_score = 0
-var offical_count = 0
+var offical_title = "";
+var offical_score = 0;
+var offical_count = 0;
 
 export class example extends plugin {
     constructor() {
@@ -119,9 +119,17 @@ export class example extends plugin {
         const baseinfo_res = await fetch(baseinfo_url, { "method": "GET" });
         var baseinfo  = await baseinfo_res.json()
         //this.reply(JSON.stringify(baseinfo.result.media.title))
-        offical_title = JSON.stringify(baseinfo.result.media.title)
-        offical_score = JSON.stringify(baseinfo.result.media.rating.score)
-        offical_count = JSON.stringify(baseinfo.result.media.rating.count)
+        offical_title = JSON.stringify(baseinfo.result.media.title).replace(/"/g, '');
+        try {
+            offical_score = JSON.stringify(baseinfo.result.media.rating.score);
+        } catch {
+            offical_score = "暂无评分";
+        }
+        try {
+            offical_count = JSON.stringify(baseinfo.result.media.rating.count);
+        } catch {
+            offical_count = "NaN";
+        }
     }
     
     async getScore(next, type, e, md_id) {
